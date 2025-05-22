@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$DIR/.env"
+COMPOSE_FILE="$DIR/docker-compose.yml"
+PROJECT_PATH="$(pwd)"
+export PROJECT_PATH="$PROJECT_PATH"
+
+docker compose -f "$COMPOSE_FILE" run --rm php "$@"

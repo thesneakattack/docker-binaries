@@ -1,0 +1,8 @@
+services:
+  php:
+    image: "${PHP_IMAGE}"
+    user: "${HOST_UID}:${HOST_GID}"
+    working_dir: /app
+    entrypoint: ["php"]
+    volumes:
+      - ${PROJECT_PATH}:/app

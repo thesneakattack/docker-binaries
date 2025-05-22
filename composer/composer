@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# docker-binaries/composer/composer
+# Single entrypoint for Composer commands
+
+set -e
+
+# Load configuration
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$DIR/.env"
+COMPOSE_FILE="$DIR/docker-compose.yml"
+
+# Ensure project path is provided
+PROJECT_PATH="$(pwd)"
+export PROJECT_PATH="$PROJECT_PATH"
+
+# Run Composer in the container
+docker compose -f "$COMPOSE_FILE" run --rm composer "$@"

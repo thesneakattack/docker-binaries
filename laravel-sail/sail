@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#
+# docker-binaries/laravel-sail/sail
+# Single entrypoint for Sail commands and Composer install commands
+
+set -e
+
+# Load configuration
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$DIR/.env"
+COMPOSE_FILE="$DIR/docker-compose.yml"
+
+# Ensure project path is provided
+PROJECT_PATH="$(pwd)"
+
+# Ensure .env is loaded with the project path
+export PROJECT_PATH="$PROJECT_PATH"
+
+# Subcommand handling
+case "$1" in
+  composer)
+    shift
+    # Always run Composer in the container
+    docker compose -f "$COMPOSE_FILE" run --rm composer "$@"
+    ;;
+  
+  install)
+    # 1. Install Sail as a dev dependency
+    docker compose -f "$COMPOSE_FILE" run --rm composer require laravel/sail --dev
+
+    # 2. Publish Sail's docker-compose.yml
+    docker compose -f "$COMPOSE_FILE" run --rm composer run-script sail:install -- --with=mysql,redis
+
+    echo "✔ Sail installed. You can now run: sail up -d"
+    ;;
+
+  *)
+    # Pass through to project-local Sail if present
+    if [ -x ./vendor/bin/sail ]; then
+      exec ./vendor/bin/sail "$@"
+    else
+      echo "✘ No ./vendor/bin/sail found in $(pwd)"
+      echo "Run 'sail install' to set up Sail in this project."
+      exit 1
+    fi
+    ;;
+esac

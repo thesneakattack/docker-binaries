@@ -1,0 +1,8 @@
+services:
+  composer:
+    image: "${COMPOSER_IMAGE}"
+    user: "${HOST_UID}:${HOST_GID}"
+    working_dir: /app
+    entrypoint: ["composer"]
+    volumes:
+      - ${PROJECT_PATH}:/app
